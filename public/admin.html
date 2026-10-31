@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Queueless | Staff Dashboard</title>
+
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/admin.css">
+
+    <script src="/admin.js" defer></script>
+</head>
+
+<body class="admin-body">
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+
+        <a href="/admin.html" class="brand">
+            <span class="brand-icon">Q</span>
+            <span>queueless.</span>
+        </a>
+
+        <div class="sidebar-clinic">
+            <small>WORKSPACE</small>
+            <h3 id="adminClinic">Sunrise Family Clinic</h3>
+            <p>Staff control panel</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#analytics">▥ Analytics & Reports</a>
+<a href="#settings">⚙ Clinic Settings</a>
+<a href="#services">☷ Service Management</a>
+            <a href="#overview" class="active">◫ Overview</a>
+            <a href="#queue">☷ Queue management</a>
+            <a href="#walkin">✚ Walk-in registration</a>
+            <a href="#activity">◷ Recent activity</a>
+            <a href="/index.html">↗ Customer website</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <span class="online-dot">●</span>
+            Local development mode
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+
+        <header class="admin-header">
+            <div>
+                <p class="eyebrow">STAFF WORKSPACE</p>
+                <h1>Queue Dashboard</h1>
+                <p>Manage your clinic queue in real time.</p>
+            </div>
+
+            <div class="header-actions">
+                <span id="queueStatus" class="status-pill">● Active</span>
+
+                <button id="pauseButton" class="btn btn-outline">
+                    Pause Queue
+                </button>
+            </div>
+        </header>
+
+        <p id="adminMessage" class="admin-message" role="status"></p>
+
+        <!-- OVERVIEW -->
+        <section id="overview" class="admin-section">
+
+            <div class="admin-stats">
+
+                <div class="stat-card">
+                    <span>People waiting</span>
+                    <strong id="statWaiting">0</strong>
+                    <small>Currently in queue</small>
+                </div>
+
+                <div class="stat-card">
+                    <span>Tokens served</span>
+                    <strong id="statServed">0</strong>
+                    <small>Completed services</small>
+                </div>
+
+                <div class="stat-card">
+                    <span>Estimated queue time</span>
+                    <strong id="statWait">0 min</strong>
+                    <small>Total waiting workload</small>
+                </div>
+
+                <div class="stat-card">
+                    <span>Average service time</span>
+                    <strong id="statAverage">5 min</strong>
+                    <small>Per completed token</small>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- QUEUE MANAGEMENT -->
+        <section id="queue" class="admin-section">
+
+            <div class="admin-card">
+
+                <div class="admin-card-header">
+                    <div>
+                        <h2>Queue Management</h2>
+                        <p>Call and manage customer tokens.</p>
+                    </div>
+
+                    <select id="serviceFilter" class="admin-select">
+                        <option value="">All services</option>
+                    </select>
+                </div>
+
+                <div class="queue-controls">
+
+                    <button id="callNextButton" class="btn btn-primary">
+                        📣 Call Next
+                    </button>
+
+                    <button id="servedButton" class="btn btn-outline">
+                        ✓ Mark Served
+                    </button>
+
+                    <button id="recallButton" class="btn btn-outline">
+                        ↻ Recall
+                    </button>
+
+                </div>
+
+                <div class="current-token">
+
+                    <div>
+                        <small>CURRENTLY CALLED</small>
+                        <h2 id="currentToken">—</h2>
+                        <p id="currentService">No active token</p>
+                    </div>
+
+                    <span id="currentStatus" class="token-badge">
+                        Waiting
+                    </span>
+
+                </div>
+
+                <div class="admin-table-wrap">
+
+                    <table class="admin-table">
+
+                        <thead>
+                            <tr>
+                                <th>Token</th>
+                                <th>Customer</th>
+                                <th>Service</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="queueTable">
+                            <tr>
+                                <td colspan="5">Loading queue...</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- WALK IN -->
+        <section id="walkin" class="admin-section">
+
+            <div class="admin-card">
+
+                <div class="admin-card-header">
+                    <div>
+                        <h2>Walk-in Registration</h2>
+                        <p>Create a token for customers visiting directly.</p>
+                    </div>
+                </div>
+
+                <form id="walkinForm" class="walkin-form">
+
+                    <div class="form-group">
+                        <label for="walkinName">Customer name</label>
+                        <input
+                            id="walkinName"
+                            type="text"
+                            maxlength="50"
+                            placeholder="Enter customer name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="walkinService">Select service</label>
+
+                        <select id="walkinService" required>
+                            <option value="">Choose service</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        + Generate Walk-in Token
+                    </button>
+
+                </form>
+
+                <p id="walkinMessage" class="form-message" role="status"></p>
+
+            </div>
+
+        </section>
+
+        <!-- ACTIVITY -->
+        <section id="activity" class="admin-section">
+
+            <div class="admin-card">
+
+                <div class="admin-card-header">
+                    <div>
+                        <h2>Recent Activity</h2>
+                        <p>Latest queue events.</p>
+                    </div>
+
+                    <button id="refreshAdmin" class="btn btn-outline">
+                        ↻ Refresh
+                    </button>
+                </div>
+
+                <div id="activityList" class="activity-list">
+                    <p>No recent activity.</p>
+                </div>
+
+            </div>
+
+        </section>
+
+<!-- ANALYTICS -->
+<section id="analytics" class="admin-section">
+
+    <div class="admin-card">
+
+        <div class="admin-card-header">
+            <div>
+                <h2>Analytics & Reports</h2>
+                <p>Monitor clinic performance and service demand.</p>
+            </div>
+
+            <button id="refreshAnalytics" class="btn btn-outline">
+                ↻ Refresh Analytics
+            </button>
+        </div>
+
+        <div class="admin-stats">
+
+            <div class="stat-card">
+                <span>Total tickets</span>
+                <strong id="totalTickets">0</strong>
+                <small>All recorded tokens</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Completed</span>
+                <strong id="totalCompleted">0</strong>
+                <small>Successfully served</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Missed</span>
+                <strong id="totalMissed">0</strong>
+                <small>Missed turns</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Completion rate</span>
+                <strong id="completionRate">0%</strong>
+                <small>Served / total tickets</small>
+            </div>
+
+        </div>
+
+        <h3 class="analytics-title">Service Performance</h3>
+
+        <div id="serviceAnalytics" class="analytics-services">
+            Loading analytics...
+        </div>
+
+        <div class="analytics-actions">
+            <button id="exportReport" class="btn btn-primary">
+                ↓ Export Queue Report
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- CLINIC SETTINGS -->
+<section id="settings" class="admin-section">
+
+    <div class="admin-card">
+
+        <div class="admin-card-header">
+            <div>
+                <h2>Clinic Settings</h2>
+                <p>Configure your clinic information.</p>
+            </div>
+        </div>
+
+        <form id="clinicSettingsForm" class="settings-form">
+
+            <div class="form-group">
+                <label for="settingName">Clinic Name</label>
+                <input id="settingName" type="text" maxlength="100" required>
+            </div>
+
+            <div class="form-group">
+                <label for="settingAddress">Clinic Address</label>
+                <input id="settingAddress" type="text" maxlength="200" required>
+            </div>
+
+            <div class="form-group">
+                <label for="settingHours">Opening Hours</label>
+                <input id="settingHours" type="text" maxlength="100" required>
+            </div>
+
+            <div class="form-group">
+                <label for="settingGrace">Grace Period (minutes)</label>
+                <input id="settingGrace" type="number" min="0" max="60" required>
+            </div>
+
+            <div class="form-group">
+                <label for="settingNotify">Notify Before (people ahead)</label>
+                <input id="settingNotify" type="number" min="0" max="20" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Save Clinic Settings
+            </button>
+
+        </form>
+
+        <p id="settingsMessage" class="form-message" role="status"></p>
+
+        <p class="settings-note">
+            Note: Grace period and notification thresholds are stored as
+            configuration values. Automatic reminders and grace-period
+            enforcement are not implemented yet.
+        </p>
+
+    </div>
+
+</section>
+
+<!-- SERVICE MANAGEMENT -->
+<section id="services" class="admin-section">
+
+    <div class="admin-card">
+
+        <div class="admin-card-header">
+            <div>
+                <h2>Service Management</h2>
+                <p>Manage available services and estimated durations.</p>
+            </div>
+        </div>
+
+        <div id="serviceSettingsList" class="service-settings-list">
+            Loading services...
+        </div>
+
+        <button id="saveServices" class="btn btn-primary">
+            Save Service Changes
+        </button>
+
+        <p id="servicesMessage" class="form-message" role="status"></p>
+
+    </div>
+
+</section>
+
+        <footer class="admin-footer">
+            Queueless © 2026 · Smart Queue Management
+        </footer>
+
+    </main>
+
+</div>
+<button id="staffLogoutBtn" type="button" style="
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  padding: 10px 16px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+">
+  Log Out
+</button>
+</body>
+</html>

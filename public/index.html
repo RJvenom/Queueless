@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Queueless | Smart Queue Management</title>
+
+    <link rel="stylesheet" href="/style.css">
+    <script src="/app.js" defer></script>
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+        <div class="container nav-content">
+
+            <a href="/" class="brand">
+                <span class="brand-icon">Q</span>
+                <span>queueless<span class="brand-dot">.</span></span>
+            </a>
+
+            <nav>
+                <a href="#home">Home</a>
+                <a href="#join">Join Queue</a>
+                <a href="#track">Track Token</a>
+                <a href="/admin.html" class="admin-link">Staff Portal</a>
+            </nav>
+
+        </div>
+    </header>
+
+    <main>
+
+        <!-- HERO -->
+        <section class="hero" id="home">
+
+            <div class="container hero-grid">
+
+                <div class="hero-content">
+
+                    <span class="eyebrow">✦ A SMARTER WAY TO WAIT</span>
+
+                    <h1>
+                        Your time matters.<br>
+                        <span>Skip the waiting line.</span>
+                    </h1>
+
+                    <p>
+                        Join a virtual queue, receive your digital token,
+                        and track your position in real time.
+                        Spend less time standing in line.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a href="#join" class="btn btn-primary">
+                            Get your token →
+                        </a>
+
+                        <a href="#track" class="btn btn-outline">
+                            Track my queue
+                        </a>
+                    </div>
+
+                    <div class="hero-trust">
+                        ✓ No app download required
+                        &nbsp;&nbsp; ✓ Free digital token
+                    </div>
+
+                </div>
+
+                <div class="hero-visual">
+
+                    <div class="live-card">
+
+                        <div class="live-top">
+                            <span>LIVE QUEUE STATUS</span>
+                            <span class="live-indicator">● LIVE</span>
+                        </div>
+
+                        <div class="live-main">
+                            <p>People currently waiting</p>
+                            <h2 id="heroWaiting">0</h2>
+                            <span>Across all services</span>
+                        </div>
+
+                        <div class="live-bottom">
+
+                            <div>
+                                <small>Tokens served</small>
+                                <strong id="heroServed">0</strong>
+                            </div>
+
+                            <div>
+                                <small>Estimated queue time</small>
+                                <strong id="heroWait">0 min</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- CLINIC INFORMATION -->
+        <section class="clinic-section">
+
+            <div class="container clinic-bar">
+
+                <div>
+                    <span class="clinic-label">YOU ARE VISITING</span>
+                    <h3 id="clinicName">Sunrise Family Clinic</h3>
+                    <p id="clinicAddress">C-Scheme, Jaipur</p>
+                </div>
+
+                <div class="clinic-hours">
+                    <span>Opening hours</span>
+                    <strong id="clinicHours">9:00 AM – 6:00 PM</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- JOIN QUEUE -->
+        <section class="section" id="join">
+
+            <div class="container">
+
+                <div class="section-heading">
+                    <span class="eyebrow">GET STARTED</span>
+                    <h2>Join the virtual queue</h2>
+                    <p>Select your service and get your digital token.</p>
+                </div>
+
+                <div class="join-layout">
+
+                    <div class="form-card">
+
+                        <h3>1. Choose your service</h3>
+
+                        <div id="servicesList" class="services-grid">
+                            <p>Loading available services...</p>
+                        </div>
+
+                        <h3>2. Your details</h3>
+
+                        <form id="joinForm">
+
+                            <div class="form-group">
+                                <label for="customerName">Full name</label>
+                                <input
+                                    type="text"
+                                    id="customerName"
+                                    placeholder="Enter your name"
+                                    maxlength="50"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="customerPhone">
+                                    Phone number (optional)
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    id="customerPhone"
+                                    placeholder="Enter phone number"
+                                    maxlength="25"
+                                >
+                            </div>
+
+                            <button type="submit" class="btn btn-primary full-width">
+                                Generate my token →
+                            </button>
+
+                        </form>
+
+                        <p id="joinMessage" class="form-message" role="status"></p>
+
+                    </div>
+
+                    <div class="info-card">
+
+                        <span class="eyebrow">HOW IT WORKS</span>
+                        <h3>Three simple steps.</h3>
+
+                        <div class="step">
+                            <span class="step-number">01</span>
+                            <div>
+                                <h4>Choose a service</h4>
+                                <p>Select what you're visiting the clinic for.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <span class="step-number">02</span>
+                            <div>
+                                <h4>Receive your token</h4>
+                                <p>Get your unique digital queue number.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <span class="step-number">03</span>
+                            <div>
+                                <h4>Track your position</h4>
+                                <p>Check your queue status without standing in line.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- TOKEN RESULT -->
+        <section class="section token-section" id="tokenResult" hidden>
+
+            <div class="container">
+
+                <div class="token-card">
+
+                    <span class="eyebrow">YOUR DIGITAL TOKEN</span>
+
+                    <h2 id="generatedToken">Q-001</h2>
+
+                    <p id="generatedService">General consultation</p>
+
+                    <div class="token-stats">
+
+                        <div>
+                            <small>Queue position</small>
+                            <strong id="generatedPosition">1</strong>
+                        </div>
+
+                        <div>
+                            <small>Estimated time</small>
+                            <strong id="generatedWait">6 min</strong>
+                        </div>
+
+                    </div>
+
+                    <p>Please save your token number for tracking.</p>
+
+                    <a href="#track" class="btn btn-primary">
+                        Track my token →
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- TRACK TOKEN -->
+        <section class="section track-section" id="track">
+
+            <div class="container">
+
+                <div class="section-heading">
+                    <span class="eyebrow">STAY UPDATED</span>
+                    <h2>Track your token</h2>
+                    <p>Enter your token number to check your current position.</p>
+                </div>
+
+                <div class="track-card">
+
+                    <form id="trackForm" class="track-form">
+
+                        <input
+                            type="text"
+                            id="trackInput"
+                            placeholder="Enter token (e.g. Q-001)"
+                            required
+                        >
+
+                        <button type="submit" class="btn btn-primary">
+                            Track token
+                        </button>
+
+                    </form>
+
+                    <p id="trackMessage" class="form-message" role="status"></p>
+
+                    <div id="trackingResult" class="tracking-result" hidden>
+
+                        <div class="tracking-header">
+                            <span>YOUR TOKEN</span>
+                            <strong id="trackingToken">Q-001</strong>
+                        </div>
+
+                        <div class="tracking-details">
+
+                            <div>
+                                <small>Status</small>
+                                <strong id="trackingStatus">Waiting</strong>
+                            </div>
+
+                            <div>
+                                <small>Position</small>
+                                <strong id="trackingPosition">1</strong>
+                            </div>
+
+                            <div>
+                                <small>Estimated wait</small>
+                                <strong id="trackingWait">6 min</strong>
+                            </div>
+
+                        </div>
+
+                        <button id="refreshTracking" class="btn btn-outline">
+                            ↻ Refresh status
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <div class="container footer-content">
+
+            <div class="brand">
+                <span class="brand-icon">Q</span>
+                <span>queueless.</span>
+            </div>
+
+            <p>Less waiting. More living.</p>
+
+            <small>© Queueless — Smart Queue Management</small>
+
+        </div>
+
+    </footer>
+
+</body>
+</html>
