@@ -777,16 +777,17 @@ if (
     }
 });
 
+
 // START SERVER
-server.listen(PORT, '127.0.0.1', () => {
+server.listen(PORT, '0.0.0.0', () => {
 
     console.log('');
     console.log('================================');
     console.log('   QUEUELESS SERVER RUNNING');
     console.log('================================');
-    console.log(`Website: http://localhost:${PORT}`);
-    console.log(`Admin:   http://localhost:${PORT}/admin.html`);
-    console.log(`API:     http://localhost:${PORT}/api/state`);
+    console.log(`Website running on port ${PORT}`);
+    console.log(`Admin: /admin.html`);
+    console.log(`API: /api/state`);
     console.log('================================');
 
 });
