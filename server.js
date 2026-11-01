@@ -2,6 +2,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { Pool } = require('pg');
 const crypto = require('crypto');
 
 require('dotenv').config();
@@ -32,6 +33,12 @@ function getStaffSession(req) {
 
 const PORT = process.env.PORT || 3000;
 const DATA = path.join(__dirname, 'data.json');
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
 const PUBLIC = path.join(__dirname, 'public');
 
 // Default clinic data
@@ -64,16 +71,50 @@ function fresh() {
 }
 
 // Load database
+// Load database from Supabase
 let db;
 
-try {
+async function initializeDatabase() {
+    try {
+        const result = await pool.query(
+            'SELECT data FROM app_state WHERE id = 1'
+        );
+
+        if (result.rows.length > 0) {
+            db = result.rows[0].data;
+            console.log('Database loaded from Supabase!');
+        } else {
+            if (fs.existsSync(DATA)) {
     db = JSON.parse(fs.readFileSync(DATA, 'utf8'));
-} catch {
+    console.log('Existing data.json loaded for migration!');
+} else {
     db = fresh();
 }
 
-function persist() {
-    fs.writeFileSync(DATA, JSON.stringify(db, null, 2));
+            await pool.query(
+                `INSERT INTO app_state (id, data)
+                 VALUES (1, $1)
+                 ON CONFLICT (id) DO NOTHING`,
+                [JSON.stringify(db)]
+            );
+
+            console.log('New database state created in Supabase!');
+        }
+    } catch (error) {
+        console.error('Supabase initialization failed:', error);
+        throw error;
+    }
+}
+
+async function persist() {
+    await pool.query(
+        `INSERT INTO app_state (id, data, updated_at)
+         VALUES (1, $1, NOW())
+         ON CONFLICT (id)
+         DO UPDATE SET data = EXCLUDED.data,
+                       updated_at = NOW()`,
+        [JSON.stringify(db)]
+    );
 }
 
 function now() {
@@ -236,7 +277,7 @@ return send(res, 200, {
     message: 'Logged in successfully.'
 });
 }        // STAFF LOGOUT
-if (p === '/api/logout' && req.method === 'POST') {2
+if (p === '/api/logout' && req.method === 'POST') {
     const cookie = (req.headers.cookie || '')
         .split(';')
         .map(x => x.trim())
@@ -328,7 +369,7 @@ if (
                 text: `${t.token} joined ${t.service}.`
             });
 
-            persist();
+            await persist();
 
             const waiting = db.tickets.filter(
                 x => x.status === 'Waiting'
@@ -418,7 +459,7 @@ if (
                 text: `${t.token} called to ${b.counter || 'Counter 1'}.`
             });
 
-            persist();
+            await persist();
 
             return send(res, 200, {
                 ticket: t,
@@ -459,7 +500,7 @@ if (
                 text: `${t.token} marked served.`
             });
 
-            persist();
+            await persist();
 
             return send(res, 200, {
                 ticket: t,
@@ -486,7 +527,7 @@ if (
                 text: `Reminder recorded for ${t.token}.`
             });
 
-            persist();
+            await persist();
 
             return send(res, 200, {
                 ok: true,
@@ -515,7 +556,7 @@ if (
                 text: `${t.token} marked missed.`
             });
 
-            persist();
+            await persist();
 
             return send(res, 200, {
                 state: snapshot()
@@ -544,7 +585,7 @@ if (
                 text: `${t.token} cancelled.`
             });
 
-            persist();
+            await persist();
 
             return send(res, 200, {
                 state: snapshot()
@@ -592,7 +633,7 @@ if (
                 text: `${t.token} issued for walk-in.`
             });
 
-            persist();
+            await persist();
 
             return send(res, 201, {
                 ticket: t,
@@ -610,7 +651,7 @@ if (
                 text: `Queue ${db.paused ? 'paused' : 'resumed'}.`
             });
 
-            persist();
+            await persist();
 
             return send(res, 200, {
                 paused: db.paused,
@@ -637,7 +678,7 @@ if (
                 }));
             }
 
-            persist();
+            await persist();
 
             return send(res, 200, snapshot());
         }
@@ -646,7 +687,7 @@ if (
         if (p === '/api/reset' && req.method === 'POST') {
 
             db = fresh();
-            persist();
+            await persist();
 
             return send(res, 200, snapshot());
         }
@@ -709,7 +750,7 @@ if (
                 token: b.token || ''
             });
 
-            persist();
+            await persist();
 
             return send(res, 200, {
                 ok: true
@@ -779,15 +820,24 @@ if (
 
 
 // START SERVER
-server.listen(PORT, '0.0.0.0', () => {
+async function startServer() {
+    try {
+        await initializeDatabase();
 
-    console.log('');
-    console.log('================================');
-    console.log('   QUEUELESS SERVER RUNNING');
-    console.log('================================');
-    console.log(`Website running on port ${PORT}`);
-    console.log(`Admin: /admin.html`);
-    console.log(`API: /api/state`);
-    console.log('================================');
+        server.listen(PORT, '0.0.0.0', () => {
+            console.log('');
+            console.log('================================');
+            console.log('   QUEUELESS SERVER RUNNING');
+            console.log('================================');
+            console.log(`Website running on port ${PORT}`);
+            console.log(`Admin: /admin.html`);
+            console.log(`API: /api/state`);
+            console.log('================================');
+        });
+    } catch (error) {
+        console.error('Server startup failed:', error);
+        process.exit(1);
+    }
+}
 
-});
+startServer();
